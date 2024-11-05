@@ -15,8 +15,7 @@ declare_id!("vPoJ2QKwJFB5Uby9FrbpCq6y6CzDZyknmZyE98GASYk");
 pub mod anchor_marketplace {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        
-        Ok(())
+    pub fn initialize(ctx: Context<Initialize>, name: String, fee: u16) -> Result<()> {
+        ctx.accounts.init(name, fee, &ctx.bumps)
     }
 }

@@ -11,5 +11,5 @@ pub struct Marketplace {
 }
 
 impl Space for Marketplace {
-    const INIT_SPACE: usize = 8 + 32 + 2 + 3 * 1 + (4 + 32);
+    const INIT_SPACE: usize = 8 + 32 + 2 + 3 + (4 + 32);
 }

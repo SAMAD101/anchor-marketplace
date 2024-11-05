@@ -12,7 +12,7 @@ pub struct List<'info> {
     #[account(mut)]
     pub maker: Signer<'info>,
     #[account(
-        seeds = [b"marketplace", marketplace.name.as_str().as_bytes()],
+        seeds = [b"marketplace", marketplace.name.as_bytes()],
         bump = marketplace.bump
     )]
     pub marketplace: Account<'info, Marketplace>,
@@ -50,7 +50,7 @@ pub struct List<'info> {
         seeds::program = metadata_program.key(),
         bump,
         constraint = metadata.collection.as_ref().unwrap().key.as_ref() == collection_mint.key().as_ref(),
-        constraint = metadata.collection.as_ref().unwrap().verified == true,
+        constraint = metadata.collection.as_ref().unwrap().verified,
     )]
     pub metadata: Account<'info, MetadataAccount>,
     #[account(

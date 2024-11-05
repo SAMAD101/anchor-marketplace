@@ -21,7 +21,7 @@ pub struct Purchase<'info> {
     pub maker: SystemAccount<'info>,
 
     #[account(
-        seeds = [b"marketplace", marketplace.name.as_str().as_bytes()],
+        seeds = [b"marketplace", marketplace.name.as_bytes()],
         bump = marketplace.bump
     )]
     pub marketplace: Account<'info, Marketplace>,
@@ -68,9 +68,9 @@ pub struct Purchase<'info> {
 impl<'info> Purchase<'info> {
     pub fn send_sol(&self) -> Result<()> {
         let marketplace_fee = (self.marketplace.fee as u64)
-            .checked_div(10000 as u64)
+            .checked_div(10000_u64)
             .unwrap()
-            .checked_mul(self.listing.price as u64)
+            .checked_mul(self.listing.price)
             .unwrap();
 
         let cpi_program = self.system_program.to_account_info();
@@ -96,9 +96,9 @@ impl<'info> Purchase<'info> {
         let cpi_ctx = CpiContext::new(cpi_program, cpi_account);
 
         let marketplace_fee = (self.marketplace.fee as u64)
-            .checked_div(10000 as u64)
+            .checked_div(10000_u64)
             .unwrap()
-            .checked_mul(self.listing.price as u64)
+            .checked_mul(self.listing.price)
             .unwrap();
 
         transfer(cpi_ctx, marketplace_fee)
