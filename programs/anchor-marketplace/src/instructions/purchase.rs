@@ -1,8 +1,16 @@
-use anchor_lang::{prelude::*, system_program::{transfer, Transfer}};
-use anchor_spl::{associated_token::AssociatedToken, token_interface::{Mint, TokenAccount, TokenInterface, transfer_checked, TransferChecked, CloseAccount, close_account}};
+use anchor_lang::{
+    prelude::*,
+    system_program::{transfer, Transfer},
+};
+use anchor_spl::{
+    associated_token::AssociatedToken,
+    token_interface::{
+        close_account, transfer_checked, CloseAccount, Mint, TokenAccount, TokenInterface,
+        TransferChecked,
+    },
+};
 
-use crate::{marketplace, state::{Listing, Marketplace}};
-
+use crate::state::{Listing, Marketplace};
 
 #[derive(Accounts)]
 pub struct Purchase<'info> {
@@ -24,7 +32,7 @@ pub struct Purchase<'info> {
         associated_token::authority = maker,
     )]
     pub vault: InterfaceAccount<'info, TokenAccount>,
-        #[account(
+    #[account(
             mut,
             seeds = [marketplace.key().as_ref(), maker_mint.key().as_ref()],
             bump = listing.bump,
@@ -57,13 +65,13 @@ pub struct Purchase<'info> {
     pub system_program: Program<'info, System>,
 }
 
-
 impl<'info> Purchase<'info> {
     pub fn send_sol(&self) -> Result<()> {
-
-        let marketplace_fee  = (self.marketplace.fee as u64)
-            .checked_div(10000 as u64).unwrap()
-            .checked_mul(self.listing.price as u64).unwrap();
+        let marketplace_fee = (self.marketplace.fee as u64)
+            .checked_div(10000 as u64)
+            .unwrap()
+            .checked_mul(self.listing.price as u64)
+            .unwrap();
 
         let cpi_program = self.system_program.to_account_info();
 
@@ -87,17 +95,16 @@ impl<'info> Purchase<'info> {
 
         let cpi_ctx = CpiContext::new(cpi_program, cpi_account);
 
-        let marketplace_fee  = (self.marketplace.fee as u64)
-            .checked_div(10000 as u64).unwrap()
-            .checked_mul(self.listing.price as u64).unwrap();
+        let marketplace_fee = (self.marketplace.fee as u64)
+            .checked_div(10000 as u64)
+            .unwrap()
+            .checked_mul(self.listing.price as u64)
+            .unwrap();
 
         transfer(cpi_ctx, marketplace_fee)
-
     }
 
-
     pub fn send_nft(&mut self) -> Result<()> {
-
         let seeds = &[
             &self.marketplace.key().to_bytes()[..],
             &self.maker_mint.key().to_bytes()[..],
@@ -107,7 +114,7 @@ impl<'info> Purchase<'info> {
 
         let cpi_program = self.token_program.to_account_info();
 
-        let cpi_accounts = TransferChecked{
+        let cpi_accounts = TransferChecked {
             from: self.vault.to_account_info(),
             mint: self.maker_mint.to_account_info(),
             to: self.taker_ata.to_account_info(),
@@ -117,12 +124,9 @@ impl<'info> Purchase<'info> {
         let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer_seeds);
 
         transfer_checked(cpi_ctx, 1, self.maker_mint.decimals)
-
     }
 
-
-    pub fn close_mint_vault(&mut self) -> Result<()>{
-
+    pub fn close_mint_vault(&mut self) -> Result<()> {
         let seeds = &[
             &self.marketplace.key().to_bytes()[..],
             &self.maker_mint.key().to_bytes()[..],
@@ -135,12 +139,11 @@ impl<'info> Purchase<'info> {
         let close_accounts = CloseAccount {
             account: self.vault.to_account_info(),
             destination: self.maker.to_account_info(),
-            authority: self.listing.to_account_info()
+            authority: self.listing.to_account_info(),
         };
 
         let cpi_ctx = CpiContext::new_with_signer(cpi_program, close_accounts, signer_seeds);
 
         close_account(cpi_ctx)
-
     }
 }

@@ -6,4 +6,3 @@ pub use list::*;
 
 pub mod purchase;
 pub use purchase::*;
-

@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
-use anchor_spl::{token_interface::{Mint, TokenInterface}};
+use anchor_spl::token_interface::{Mint, TokenInterface};
 
-use crate::state::{Listing, Marketplace};
+use crate::state::Marketplace;
 
 use crate::error::MarketplaceError;
 
@@ -38,11 +38,12 @@ pub struct Initialize<'info> {
     pub token_program: Interface<'info, TokenInterface>,
 }
 
-
-
 impl<'info> Initialize<'info> {
-    pub fn init(&mut self, name: String, fee: u16, bumps: &InitializeBumps) -> Result<()>{
-        require!(name.len() > 0 && name.len() < 4 + 33, MarketplaceError::NameToLong);
+    pub fn init(&mut self, name: String, fee: u16, bumps: &InitializeBumps) -> Result<()> {
+        require!(
+            name.len() > 0 && name.len() < 4 + 33,
+            MarketplaceError::NameToLong
+        );
 
         self.marketplace.set_inner(Marketplace {
             admin: self.admin.key(),
@@ -50,7 +51,7 @@ impl<'info> Initialize<'info> {
             bump: bumps.marketplace,
             treasury_bump: bumps.treasury,
             reward_bump: bumps.rewards_mint,
-            name
+            name,
         });
         Ok(())
     }
