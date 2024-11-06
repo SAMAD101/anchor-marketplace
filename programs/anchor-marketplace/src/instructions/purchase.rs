@@ -68,9 +68,9 @@ pub struct Purchase<'info> {
 impl<'info> Purchase<'info> {
     pub fn send_sol(&self) -> Result<()> {
         let marketplace_fee = (self.marketplace.fee as u64)
-            .checked_div(10000_u64)
-            .unwrap()
             .checked_mul(self.listing.price)
+            .unwrap()
+            .checked_div(10000_u64)
             .unwrap();
 
         let cpi_program = self.system_program.to_account_info();
@@ -94,12 +94,6 @@ impl<'info> Purchase<'info> {
         };
 
         let cpi_ctx = CpiContext::new(cpi_program, cpi_account);
-
-        let marketplace_fee = (self.marketplace.fee as u64)
-            .checked_div(10000_u64)
-            .unwrap()
-            .checked_mul(self.listing.price)
-            .unwrap();
 
         transfer(cpi_ctx, marketplace_fee)
     }
